@@ -94,6 +94,7 @@ barrios = barrios.merge(hurtos_agg, left_index=True, right_index=True, how='left
 barrios['hurtos'] = barrios['hurtos'].fillna(0)
 
 # Crear gráfico de choropleth con Plotly Express
+st.subheader("Mapa de hurtos por barrios de la ciudad: ")
 fig_mapa = px.choropleth(barrios,
                         geojson=barrios.geometry,
                         locations=barrios.index,
