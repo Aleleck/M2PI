@@ -19,7 +19,8 @@ year_range = st.slider("Seleccione un rango de años:", min_value=int(hurto['Fec
 
 # Filtrar por rango de años seleccionado
 hurto_filtered = hurto[(hurto['Fecha Hurto Año'] >= year_range[0]) & (hurto['Fecha Hurto Año'] <= year_range[1])]
-
+with st.expander("Ver DataFrame completo"):
+    st.write(hurto_filtered)
 # Crear columnas
 col1, col2, col3 = st.columns((3, 3, 4))
 
