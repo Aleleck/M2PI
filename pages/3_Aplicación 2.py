@@ -5,12 +5,17 @@ import os
 import warnings
 import plotly.graph_objects as go
 import geopandas as gpd
-
+import spacy
 warnings.filterwarnings('ignore')
+
 
 st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
 st.title('Analisis de hurtos en la ciudad de Medellín.')
-hurto = pd.read_excel(os.path.join(os.path.dirname(__file__), 'assets', 'Hurtos.xlsx'))
+@st.cache_data
+def cargar_datos():
+    return pd.read_excel(os.path.join(os.path.dirname(__file__), 'assets', 'Hurtos.xlsx'))
+
+hurto = cargar_datos()
 hurto['Código Postal'] = hurto['Código Postal'].str.replace('#', '')  # quitar "#"
 hurto['Hora Hurto'] = pd.to_datetime(hurto['Hora Hurto'], format='%H:%M:%S')
 col1, col2, col3 = st.columns((3))
@@ -58,10 +63,14 @@ hurto_filtered['Hora'] = hurto_filtered['Hora Hurto'].dt.hour
 hxhora_filtered = hurto_filtered.groupby('Hora')['Fecha Hurto Año'].agg(['count']).reset_index()
 
 # Crear gráfico de líneas con Plotly Express
-fig = px.line(hxhora_filtered, x='Hora', y='count',
-            labels={'Hora': 'Hora del día', 'count': 'Cantidad de hurtos'},
-            title=f'Hurto por horas en el rango de años {year_range[0]}-{year_range[1]} ({", ".join(gender_filter)}) - Edades: {", ".join(age_ranges)} - Modalidades: {", ".join(theft_modes)}', width=800, height=400, markers=True)
 
+def generar_grafico_linea(hxhora_filtered, year_range, gender_filter, age_ranges, theft_modes):
+    fig = px.line(hxhora_filtered, x='Hora', y='count', labels={'Hora': 'Hora del día', 'count': 'Cantidad de hurtos'},
+                title=f'Hurto por horas en el rango de años {year_range[0]}-{year_range[1]} ({", ".join(gender_filter)}) - Edades: {", ".join(age_ranges)} - Modalidades: {", ".join(theft_modes)}',
+                width=800, height=400, markers=True)
+    return fig
+
+fig = generar_grafico_linea(hxhora_filtered, year_range, gender_filter, age_ranges, theft_modes)
 st.plotly_chart(fig)
 
 a1, a2 = st.columns((2))
