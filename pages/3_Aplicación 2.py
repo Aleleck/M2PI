@@ -63,23 +63,29 @@ fig = px.line(hxhora_filtered, x='Hora', y='count',
 
 st.plotly_chart(fig)
 
-# Mapa de hurtos por barrios
+# Mapa de todos los barrios
 mapa = gpd.read_file(os.path.join(os.path.dirname(__file__), 'assets', 'BarrioVereda_2014.shp'))
 mapa = mapa.set_index('CODIGO')
+
+# Crear GeoDataFrame con todos los barrios
+barrios = gpd.read_file(os.path.join(os.path.dirname(__file__), 'assets', 'BarrioVereda_2014.shp'))
+barrios = barrios.set_index('CODIGO')
 
 # Contar los hurtos por barrio
 hurtos_agg = hurto_filtered.groupby('Código Postal')['Barrio'].agg(['count'])
 hurtos_agg = hurtos_agg.rename(columns={'count': 'hurtos'})
-datos = mapa.merge(hurtos_agg, left_index=True, right_index=True)
 
+# Agregar la información de hurtos al GeoDataFrame de todos los barrios
+barrios = barrios.merge(hurtos_agg, left_index=True, right_index=True, how='left')
+barrios['hurtos'] = barrios['hurtos'].fillna(0)
 
 # Crear gráfico de choropleth con Plotly Express
-fig_mapa = px.choropleth(datos,
-                        geojson=datos.geometry,
-                        locations=datos.index,
+fig_mapa = px.choropleth(barrios,
+                        geojson=barrios.geometry,
+                        locations=barrios.index,
                         color='hurtos',
                         color_continuous_scale="Viridis",
-                        hover_name=datos.NOMBRE,
+                        hover_name=barrios.NOMBRE,
                         hover_data={'NOMBRE': False, 'hurtos': True},
                         projection="natural earth")
 
@@ -91,5 +97,4 @@ fig_mapa.update_layout(
     height=800,
     margin={"r": 0, "t": 0, "l": 0, "b": 0}
 )
-#fig_mapa.update_traces(marker_line_width=1, marker_line_color="white", selector=dict(type='choropleth'))
 st.plotly_chart(fig_mapa)
