@@ -63,6 +63,20 @@ fig = px.line(hxhora_filtered, x='Hora', y='count',
 
 st.plotly_chart(fig)
 
+a1, a2 = st.columns((2))
+
+bins = [0, 5, 12, 19, 24]
+labels = ['Madrugada', 'Mañana', 'Tarde', 'Noche']
+hurto_filtered['Periodo del día'] = pd.cut(hurto_filtered['Hora Hurto'].dt.hour, bins=bins, labels=labels, include_lowest=True)
+# Gráfico de dona para la comparación de hurtos por género
+fig_dona_genero = px.pie(hurto_filtered, names='Sexo', title='Comparación de Hurtos por Género', hole=.5, width=350, height=300)
+a1.plotly_chart(fig_dona_genero)
+
+# Gráfico de dona para la comparación de hurtos por período del día
+fig_dona_periodo_dia = px.pie(hurto_filtered, names='Periodo del día',title='Comparación de Hurtos por Período del Día', hole=.5,width=350, height=300)
+a2.plotly_chart(fig_dona_periodo_dia)
+
+
 # Mapa de todos los barrios
 mapa = gpd.read_file(os.path.join(os.path.dirname(__file__), 'assets', 'BarrioVereda_2014.shp'))
 mapa = mapa.set_index('CODIGO')
@@ -94,7 +108,7 @@ fig_mapa.update_layout(
     plot_bgcolor='rgba(0,0,0,0)',
     autosize=False,
     width=800,
-    height=800,
+    height=500,
     margin={"r": 0, "t": 0, "l": 0, "b": 0}
 )
 st.plotly_chart(fig_mapa)
