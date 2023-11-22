@@ -5,7 +5,6 @@ import os
 import warnings
 import plotly.graph_objects as go
 import geopandas as gpd
-import spacy
 warnings.filterwarnings('ignore')
 
 
@@ -54,6 +53,7 @@ with col3:
     theft_modes = st.multiselect("Seleccione la modalidad de hurto:", ["Todos"] + list(hurto['Modalidad de hurto'].unique()), default=["Todos"])
     if "Todos" not in theft_modes:
         hurto_filtered = hurto_filtered[hurto_filtered['Modalidad de hurto'].isin(theft_modes)]
+
 
 
 # Extraer la hora de la hora
