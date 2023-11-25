@@ -1,4 +1,4 @@
-Generar el archivo requirements.txt
+coGenerar el archivo requirements.txt
 
 pip freeze > requirements.txt
 
