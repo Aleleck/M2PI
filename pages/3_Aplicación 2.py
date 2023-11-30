@@ -73,6 +73,30 @@ def generar_grafico_linea(hxhora_filtered, year_range, gender_filter, age_ranges
 fig = generar_grafico_linea(hxhora_filtered, year_range, gender_filter, age_ranges, theft_modes)
 st.plotly_chart(fig)
 
+# Filtrar por rango de años seleccionado para el segundo gráfico
+hurto_por_anio = hurto.groupby('Fecha Hurto Año')['Fecha Hurto Año'].agg(['count']).reset_index()
+
+# Crear gráfico de barras para la cantidad de hurtos por año
+fig_linea = go.Figure(data=go.Scatter(x=hurto_por_anio['Fecha Hurto Año'], y=hurto_por_anio['count'],
+                                      mode='lines',
+                                      line=dict(color='blue', width=2),
+                                      name='Línea'))
+
+# Añadir puntos al gráfico de líneas
+fig_linea.add_trace(go.Scatter(x=hurto_por_anio['Fecha Hurto Año'], y=hurto_por_anio['count'],
+                               mode='markers',
+                               marker=dict(size=8, color='red'),
+                               name='Puntos'))
+
+# Configurar el diseño del gráfico
+fig_linea.update_layout(title='Cantidad de hurtos por año',
+                        xaxis=dict(title='Año', tickmode='linear', dtick=1),
+                        yaxis=dict(title='Cantidad de hurtos'),
+                        width=800, height=400)
+
+# Mostrar el gráfico
+st.plotly_chart(fig_linea)
+
 a1, a2 = st.columns((2))
 
 bins = [0, 5, 12, 19, 24]
